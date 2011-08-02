@@ -45,7 +45,28 @@ if ( ! function_exists('read_file'))
 			return FALSE;
 		}
 
-		return file_get_contents($file);
+		if (function_exists('file_get_contents'))
+		{
+			return file_get_contents($file);
+		}
+
+		if ( ! $fp = @fopen($file, FOPEN_READ))
+		{
+			return FALSE;
+		}
+
+		flock($fp, LOCK_SH);
+
+		$data = '';
+		if (filesize($file) > 0)
+		{
+			$data =& fread($fp, filesize($file));
+		}
+
+		flock($fp, LOCK_UN);
+		fclose($fp);
+
+		return $data;
 	}
 }
 
@@ -107,7 +128,7 @@ if ( ! function_exists('delete_files'))
 			return FALSE;
 		}
 
-		while(FALSE !== ($filename = @readdir($current_dir)))
+		while (FALSE !== ($filename = @readdir($current_dir)))
 		{
 			if ($filename != "." and $filename != "..")
 			{
@@ -331,7 +352,16 @@ if ( ! function_exists('get_mime_by_extension'))
 
 		if ( ! is_array($mimes))
 		{
-			if ( ! require_once(APPPATH.'config/mimes.php'))
+			if (defined('ENVIRONMENT') AND is_file(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+			{
+				include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php');
+			}
+			elseif (is_file(APPPATH.'config/mimes.php'))
+			{
+				include(APPPATH.'config/mimes.php');
+			}
+
+			if ( ! is_array($mimes))
 			{
 				return FALSE;
 			}

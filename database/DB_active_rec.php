@@ -60,8 +60,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	var $ar_cache_set			= array();
 	
 	var $ar_no_escape 			= array();
-	var $ar_cache_no_escape		= array();
-
+	var $ar_cache_no_escape     = array();
 
 	// --------------------------------------------------------------------
 
@@ -206,7 +205,6 @@ class CI_DB_active_record extends CI_DB_driver {
 		$sql = $type.'('.$this->_protect_identifiers(trim($select)).') AS '.$alias;
 
 		$this->ar_select[] = $sql;
-		$this->ar_no_escape[] = NULL;
 
 		if ($this->ar_caching === TRUE)
 		{
@@ -954,7 +952,7 @@ class CI_DB_active_record extends CI_DB_driver {
 			}
 			else
 			{
-				$this->ar_set[$this->_protect_identifiers($k)] = $this->escape($v);
+				$this->ar_set[$this->_protect_identifiers($k, FALSE, TRUE)] = $this->escape($v);
 			}
 		}
 
@@ -1020,11 +1018,11 @@ class CI_DB_active_record extends CI_DB_driver {
 
 		if ($query->num_rows() == 0)
 		{
-			return '0';
+			return 0;
 		}
 
 		$row = $query->row();
-		return $row->numrows;
+		return (int) $row->numrows;
 	}
 
 	// --------------------------------------------------------------------
@@ -1156,7 +1154,7 @@ class CI_DB_active_record extends CI_DB_driver {
 				$this->ar_set[] = array();
 				return;
 			}
-		
+
 			ksort($row); // puts $row in the same order as our keys
 
 			if ($escape === FALSE)
@@ -1167,7 +1165,7 @@ class CI_DB_active_record extends CI_DB_driver {
 			{
 				$clean = array();
 
-				foreach($row as $value)
+				foreach ($row as $value)
 				{
 					$clean[] = $this->escape($value);
 				}
@@ -1425,7 +1423,7 @@ class CI_DB_active_record extends CI_DB_driver {
 			$index_set = FALSE;
 			$clean = array();
 
-			foreach($v as $k2 => $v2)
+			foreach ($v as $k2 => $v2)
 			{
 				if ($k2 == $index)
 				{
@@ -1569,7 +1567,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		}
 		elseif (is_array($table))
 		{
-			foreach($table as $single_table)
+			foreach ($table as $single_table)
 			{
 				$this->delete($single_table, $where, $limit, FALSE);
 			}
@@ -1946,7 +1944,7 @@ class CI_DB_active_record extends CI_DB_driver {
 									'ar_cache_orderby'		=> array(),
 									'ar_cache_set'			=> array(),
 									'ar_cache_exists'		=> array(),
-									'ar_cache_no_escape'    => array(),
+									'ar_cache_no_escape'	=> array()
 								)
 							);
 	}
@@ -1988,7 +1986,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		{
 			$this->_track_aliases($this->ar_from);
 		}
-		
+
 		$this->ar_no_escape = $this->ar_cache_no_escape;
 	}
 

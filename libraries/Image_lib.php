@@ -749,7 +749,7 @@ class CI_Image_lib {
 
 		@chmod($this->full_dst_path, FILE_WRITE_MODE);
 
-		return true;
+		return TRUE;
 	}
 
 	// --------------------------------------------------------------------
@@ -1448,7 +1448,7 @@ class CI_Image_lib {
 	{
 		if ( ! extension_loaded('gd'))
 		{
-			if (! function_exists('dl') OR ! @dl('gd.so'))
+			if ( ! dl('gd.so'))
 			{
 				return FALSE;
 			}

@@ -34,7 +34,7 @@ class CI_Utf8 {
 	 * Determines if UTF-8 support is to be enabled
 	 *
 	 */
-	public function __construct()
+	function __construct()
 	{
 		log_message('debug', "Utf8 Class Initialized");
 
@@ -78,10 +78,11 @@ class CI_Utf8 {
 	 *
 	 * Ensures strings are UTF-8
 	 *
+	 * @access	public
 	 * @param	string
 	 * @return	string
 	 */
-	public function clean_string($str)
+	function clean_string($str)
 	{
 		if ($this->_is_ascii($str) === FALSE)
 		{
@@ -100,10 +101,11 @@ class CI_Utf8 {
 	 * line feeds, and carriage returns, as all others can cause
 	 * problems in XML
 	 *
+	 * @access	public
 	 * @param	string
 	 * @return	string
 	 */
-	public function safe_ascii_for_xml($str)
+	function safe_ascii_for_xml($str)
 	{
 		return remove_invisible_characters($str, FALSE);
 	}
@@ -115,11 +117,12 @@ class CI_Utf8 {
 	 *
 	 * Attempts to convert a string to UTF-8
 	 *
+	 * @access	public
 	 * @param	string
 	 * @param	string	- input encoding
 	 * @return	string
 	 */
-	public function convert_to_utf8($str, $encoding)
+	function convert_to_utf8($str, $encoding)
 	{
 		if (function_exists('iconv'))
 		{
@@ -144,10 +147,11 @@ class CI_Utf8 {
 	 *
 	 * Tests if a string is standard 7-bit ASCII or not
 	 *
+	 * @access	public
 	 * @param	string
 	 * @return	bool
 	 */
-	public function _is_ascii($str)
+	function _is_ascii($str)
 	{
 		return (preg_match('/[^\x00-\x7F]/S', $str) == 0);
 	}

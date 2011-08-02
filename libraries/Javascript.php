@@ -856,7 +856,6 @@ class CI_Javascript {
 		elseif (is_string($result) OR $is_key)
 		{
 			return '"'.str_replace(array('\\', "\t", "\n", "\r", '"', '/'), array('\\\\', '\\t', '\\n', "\\r", '\"', '\/'), $result).'"';			
-			
 		}
 		elseif (is_scalar($result))
 		{

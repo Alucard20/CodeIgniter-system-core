@@ -39,6 +39,8 @@
 * @param	string
 * @return	bool	TRUE if the current version is $version or higher
 */
+if ( ! function_exists('is_php'))
+{
 	function is_php($version = '5.0.0')
 	{
 		static $_is_php;
@@ -51,6 +53,7 @@
 
 		return $_is_php[$version];
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -64,6 +67,8 @@
  * @access	private
  * @return	void
  */
+if ( ! function_exists('is_really_writable'))
+{
 	function is_really_writable($file)
 	{
 		// If we're on a Unix server with safe_mode off we call is_writable
@@ -88,7 +93,7 @@
 			@unlink($file);
 			return TRUE;
 		}
-		elseif (($fp = @fopen($file, FOPEN_WRITE_CREATE)) === FALSE)
+		elseif ( ! is_file($file) OR ($fp = @fopen($file, FOPEN_WRITE_CREATE)) === FALSE)
 		{
 			return FALSE;
 		}
@@ -96,6 +101,7 @@
 		fclose($fp);
 		return TRUE;
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -112,6 +118,8 @@
 * @param	string	the class name prefix
 * @return	object
 */
+if ( ! function_exists('load_class'))
+{
 	function &load_class($class, $directory = 'libraries', $prefix = 'CI_')
 	{
 		static $_classes = array();
@@ -166,6 +174,7 @@
 		$_classes[$class] = new $name();
 		return $_classes[$class];
 	}
+}
 
 // --------------------------------------------------------------------
 
@@ -176,6 +185,8 @@
 * @access	public
 * @return	array
 */
+if ( ! function_exists('is_loaded'))
+{
 	function is_loaded($class = '')
 	{
 		static $_is_loaded = array();
@@ -187,6 +198,7 @@
 
 		return $_is_loaded;
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -199,6 +211,8 @@
 * @access	private
 * @return	array
 */
+if ( ! function_exists('get_config'))
+{
 	function &get_config($replace = array())
 	{
 		static $_config;
@@ -208,15 +222,19 @@
 			return $_config[0];
 		}
 
+		// Is the config file in the environment folder?
+		if ( ! defined('ENVIRONMENT') OR ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+		{
+			$file_path = APPPATH.'config/config.php';
+		}
+
 		// Fetch the config file
-		if ( ! file_exists(APPPATH.'config/config.php'))
+		if ( ! file_exists($file_path))
 		{
 			exit('The configuration file does not exist.');
 		}
-		else
-		{
-			require(APPPATH.'config/config.php');
-		}
+
+		require($file_path);
 
 		// Does the $config array exist in the file?
 		if ( ! isset($config) OR ! is_array($config))
@@ -238,6 +256,7 @@
 
 		return $_config[0] =& $config;
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -247,6 +266,8 @@
 * @access	public
 * @return	mixed
 */
+if ( ! function_exists('config_item'))
+{
 	function config_item($item)
 	{
 		static $_config_item = array();
@@ -264,6 +285,7 @@
 
 		return $_config_item[$item];
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -279,12 +301,15 @@
 * @access	public
 * @return	void
 */
+if ( ! function_exists('show_error'))
+{
 	function show_error($message, $status_code = 500, $heading = 'An Error Was Encountered')
 	{
 		$_error =& load_class('Exceptions', 'core');
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
 		exit;
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -298,12 +323,15 @@
 * @access	public
 * @return	void
 */
+if ( ! function_exists('show_404'))
+{
 	function show_404($page = '', $log_error = TRUE)
 	{
 		$_error =& load_class('Exceptions', 'core');
 		$_error->show_404($page, $log_error);
 		exit;
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -316,6 +344,8 @@
 * @access	public
 * @return	void
 */
+if ( ! function_exists('log_message'))
+{
 	function log_message($level = 'error', $message, $php_error = FALSE)
 	{
 		static $_log;
@@ -328,6 +358,7 @@
 		$_log =& load_class('Log');
 		$_log->write_log($level, $message, $php_error);
 	}
+}
 
 // ------------------------------------------------------------------------
 
@@ -339,6 +370,8 @@
  * @param	string
  * @return	void
  */
+if ( ! function_exists('set_status_header'))
+{
 	function set_status_header($code = 200, $text = '')
 	{
 		$stati = array(
@@ -413,13 +446,14 @@
 			header("HTTP/1.1 {$code} {$text}", TRUE, $code);
 		}
 	}
+}
 
 // --------------------------------------------------------------------
 
 /**
 * Exception Handler
 *
-* This is the custom exception handler that is declared at the top
+* This is the custom exception handler that is declaired at the top
 * of Codeigniter.php.  The main reason we use this is to permit
 * PHP errors to be logged in our own log files since the user may
 * not have access to server logs. Since this function
@@ -430,6 +464,8 @@
 * @access	private
 * @return	void
 */
+if ( ! function_exists('_exception_handler'))
+{
 	function _exception_handler($severity, $message, $filepath, $line)
 	{
 		 // We don't bother with "strict" notices since they tend to fill up
@@ -459,19 +495,22 @@
 
 		$_error->log_exception($severity, $message, $filepath, $line);
 	}
+}
 
-	// --------------------------------------------------------------------
+// --------------------------------------------------------------------
 
-	/**
-	 * Remove Invisible Characters
-	 *
-	 * This prevents sandwiching null characters
-	 * between ascii characters, like Java\0script.
-	 *
-	 * @access	public
-	 * @param	string
-	 * @return	string
-	 */
+/**
+ * Remove Invisible Characters
+ *
+ * This prevents sandwiching null characters
+ * between ascii characters, like Java\0script.
+ *
+ * @access	public
+ * @param	string
+ * @return	string
+ */
+if ( ! function_exists('remove_invisible_characters'))
+{
 	function remove_invisible_characters($str, $url_encoded = TRUE)
 	{
 		$non_displayables = array();
@@ -495,6 +534,7 @@
 
 		return $str;
 	}
+}
 
 /* End of file Common.php */
 /* Location: ./system/core/Common.php */

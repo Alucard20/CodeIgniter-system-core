@@ -54,9 +54,6 @@ class CI_DB_mysql_driver extends CI_DB {
 	var $_count_string = 'SELECT COUNT(*) AS ';
 	var $_random_keyword = ' RAND()'; // database specific random keyword
 
-	// whether SET NAMES must be used to set the character set
-	var $use_set_names;
-	
 	/**
 	 * Non-persistent database connection
 	 *
@@ -135,13 +132,15 @@ class CI_DB_mysql_driver extends CI_DB {
 	 */
 	function db_set_charset($charset, $collation)
 	{
-		if ( ! isset($this->use_set_names))
+		static $use_set_names;
+		
+		if ( ! isset($use_set_names))
 		{
 			// mysql_set_charset() requires PHP >= 5.2.3 and MySQL >= 5.0.7, use SET NAMES as fallback
-			$this->use_set_names = (version_compare(PHP_VERSION, '5.2.3', '>=') && version_compare(mysql_get_server_info(), '5.0.7', '>=')) ? FALSE : TRUE;
+			$use_set_names = (version_compare(PHP_VERSION, '5.2.3', '>=') && version_compare(mysql_get_server_info(), '5.0.7', '>=')) ? FALSE : TRUE;
 		}
 
-		if ($this->use_set_names === TRUE)
+		if ($use_set_names)
 		{
 			return @mysql_query("SET NAMES '".$this->escape_str($charset)."' COLLATE '".$this->escape_str($collation)."'", $this->conn_id);
 		}
@@ -302,13 +301,13 @@ class CI_DB_mysql_driver extends CI_DB {
 	{
 		if (is_array($str))
 		{
-			foreach($str as $key => $val)
-			{
+			foreach ($str as $key => $val)
+	   		{
 				$str[$key] = $this->escape_str($val, $like);
-			}
+	   		}
 
-			return $str;
-		}
+	   		return $str;
+	   	}
 
 		if (function_exists('mysql_real_escape_string') AND is_resource($this->conn_id))
 		{
@@ -606,9 +605,9 @@ class CI_DB_mysql_driver extends CI_DB {
 	 */
 	function _update($table, $values, $where, $orderby = array(), $limit = FALSE)
 	{
-		foreach($values as $key => $val)
+		foreach ($values as $key => $val)
 		{
-			$valstr[] = $key." = ".$val;
+			$valstr[] = $key . ' = ' . $val;
 		}
 
 		$limit = ( ! $limit) ? '' : ' LIMIT '.$limit;
@@ -643,11 +642,11 @@ class CI_DB_mysql_driver extends CI_DB {
 		$ids = array();
 		$where = ($where != '' AND count($where) >=1) ? implode(" ", $where).' AND ' : '';
 
-		foreach($values as $key => $val)
+		foreach ($values as $key => $val)
 		{
 			$ids[] = $val[$index];
 
-			foreach(array_keys($val) as $field)
+			foreach (array_keys($val) as $field)
 			{
 				if ($field != $index)
 				{
@@ -659,7 +658,7 @@ class CI_DB_mysql_driver extends CI_DB {
 		$sql = "UPDATE ".$table." SET ";
 		$cases = '';
 
-		foreach($final as $k => $v)
+		foreach ($final as $k => $v)
 		{
 			$cases .= $k.' = CASE '."\n";
 			foreach ($v as $row)
