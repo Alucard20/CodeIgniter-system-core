@@ -196,7 +196,7 @@ class CI_DB_active_record extends CI_DB_driver {
 			$alias = $this->_create_alias_from_table(trim($select));
 		}
 
-		$sql = $type.'('.$this->_protect_identifiers(trim($select)).') AS '.$this->_protect_identifiers(trim($alias));
+		$sql = $type.'('.$this->_protect_identifiers(trim($select)).') AS '.$alias;
 
 		$this->ar_select[] = $sql;
 
@@ -660,12 +660,8 @@ class CI_DB_active_record extends CI_DB_driver {
 			$prefix = (count($this->ar_like) == 0) ? '' : $type;
 
 			$v = $this->escape_like_str($v);
-			
-			if ($side == 'none')
-			{
-				$like_statement = $prefix." $k $not LIKE '{$v}'";
-			}
-			elseif ($side == 'before')
+
+			if ($side == 'before')
 			{
 				$like_statement = $prefix." $k $not LIKE '%{$v}'";
 			}
@@ -872,13 +868,13 @@ class CI_DB_active_record extends CI_DB_driver {
 	 * @param	integer	the offset value
 	 * @return	object
 	 */
-	public function limit($value, $offset = NULL)
+	public function limit($value, $offset = '')
 	{
-		$this->ar_limit = (int) $value;
+		$this->ar_limit = $value;
 
-		if ( ! is_null($offset))
+		if ($offset != '')
 		{
-			$this->ar_offset = (int) $offset;
+			$this->ar_offset = $offset;
 		}
 
 		return $this;
@@ -894,7 +890,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	 */
 	public function offset($offset)
 	{
-		$this->ar_offset = (int) $offset;
+		$this->ar_offset = $offset;
 		return $this;
 	}
 
@@ -1326,7 +1322,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		{
 			if ($this->db_debug)
 			{
-				return $this->display_error('db_must_use_index');
+				return $this->display_error('db_myst_use_index');
 			}
 
 			return FALSE;
